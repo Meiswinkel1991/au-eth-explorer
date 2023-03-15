@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Network, Alchemy } from "alchemy-sdk"
 
 const settings = {
-    apiKey: "T1ifGbdsjAWvyF7vv2vR8JnoOJN_COLo",
+    apiKey: "",
     network: Network.ETH_MAINNET,
 }
 
