@@ -6,10 +6,10 @@ const NavItemsCollection = () => {
         <div>
             {/* hamburgerButton */}
             <nav className="hidden space-x-8 text-xl md:block" aria-label="main">
-                <NavItem href="#" mobile>
+                <NavItem href="/" mobile>
                     Home
                 </NavItem>
-                <NavItem href="#" mobile>
+                <NavItem href="/blocks" mobile>
                     Blocks
                 </NavItem>
                 <NavItem href="#" mobile>

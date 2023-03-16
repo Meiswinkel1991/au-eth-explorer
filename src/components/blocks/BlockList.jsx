@@ -1,5 +1,5 @@
 import React from "react"
-import { useAlchemy } from "@/hooks/useAlchemy"
+import { useAlchemy } from "@/store/alchemy"
 import BlockListItem from "./BlockListItem"
 import List from "../ui/List"
 

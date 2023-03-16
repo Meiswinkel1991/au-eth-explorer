@@ -1,5 +1,7 @@
 import BlockList from "@/components/blocks/BlockList"
 import TransactionList from "@/components/transactions/TransactionList"
+import InfoScreen from "@/components/info-screen/InfoScreen"
+import SearchBar from "@/components/searchbar/SearchBar"
 
 export default function Home() {
     return (
@@ -7,6 +9,8 @@ export default function Home() {
             <h1 className="text-4xl font-semibold text-center text-blue-900">
                 Ethereum Block Explorer
             </h1>
+            <SearchBar />
+            <InfoScreen />
             <div className="flex flex-col md:flex-row items-start justify-between space-x-8 ">
                 <BlockList />
                 <TransactionList />
