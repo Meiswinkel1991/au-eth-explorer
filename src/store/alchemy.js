@@ -7,6 +7,7 @@ const AlchemyContext = createContext({
     latestBlockNumber: 0,
     gasPrice: 0.0,
     updateBlockNumber: () => {},
+    fetchTokensFromAccount: () => {},
 })
 
 export const AlchemyProvider = ({ children, apiKey }) => {
@@ -58,12 +59,28 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         setTransactions(_blockData.transactions)
     }
 
+    const fetchTokensFromAccount = async (address) => {
+        const accountInfoTokens = await alchemy.core.getTokenBalances(address)
+        const _tokenBalances = accountInfoTokens.tokenBalances
+
+        const tokenBalanceData = []
+
+        _tokenBalances.forEach(async (token) => {
+            const metaData = await alchemy.core.getTokenMetadata(token.contractAddress)
+
+            token = { ...token, ...metaData }
+
+            console.log(token)
+        })
+    }
+
     const context = {
         blocks: blocks,
         transactions: transactions,
         latestBlockNumber: latestBlockNumber,
         updateBlockNumber: updateBlockNumber,
         gasPrice: gasPrice,
+        fetchTokensFromAccount: fetchTokensFromAccount,
     }
 
     return <AlchemyContext.Provider value={context}>{children}</AlchemyContext.Provider>

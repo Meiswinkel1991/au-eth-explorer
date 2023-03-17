@@ -15,6 +15,9 @@ const NavItemsCollection = () => {
                 <NavItem href="#" mobile>
                     Transactions
                 </NavItem>
+                <NavItem href="/accounts" mobile>
+                    Accounts
+                </NavItem>
             </nav>
         </div>
     )
