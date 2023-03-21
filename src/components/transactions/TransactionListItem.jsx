@@ -9,7 +9,7 @@ export const TransactionListItem = ({ trxHash, from, value }) => {
             <div className="flex flex-start items-start">
                 <MdOutlineSwapHorizontalCircle className="text-2xl text-blue-900 mt-1" />
                 <div className="mx-2">
-                    <h2 className="font-semibold text-blue-900 text-xl m-0 p-0">
+                    <h2 className="font-semibold text-blue-900 text-lg m-0 p-0">
                         {trxHash.slice(0, 8)}...{trxHash.slice(-8)}
                     </h2>
                 </div>

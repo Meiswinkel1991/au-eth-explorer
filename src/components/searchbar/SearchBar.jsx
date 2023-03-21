@@ -28,9 +28,7 @@ const SearchBar = () => {
                 onChange={handleSearchInputChange}
                 placeholder="Search ... "
                 className="peer block min-h-[auto] w-full rounded border-0 bg-white py-[0.32rem] px-3 leading-[1.6] outline-none text-blue-900 text-lg"
-                onKeyDown={handleOnSubmit}
             />
-            <div>SeacrhIcon</div>
         </div>
     )
 }

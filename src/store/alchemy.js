@@ -6,8 +6,10 @@ const AlchemyContext = createContext({
     transactions: [],
     latestBlockNumber: 0,
     gasPrice: 0.0,
+    blockDetail: {},
     updateBlockNumber: () => {},
     fetchTokensFromAccount: () => {},
+    fetchBlockInformation: () => {},
 })
 
 export const AlchemyProvider = ({ children, apiKey }) => {
@@ -15,6 +17,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     const [transactions, setTransactions] = useState([])
     const [latestBlockNumber, setLatestBlockNumber] = useState(0)
     const [gasPrice, setGasPrice] = useState(0.0)
+    const [blockDetail, setBlockDetail] = useState()
 
     const settings = {
         apiKey: apiKey,
@@ -74,13 +77,20 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         })
     }
 
+    const fetchBlockInformation = async (_blockNumber) => {
+        const _blockInfo = await alchemy.core.getBlockWithTransactions(_blockNumber)
+        setBlockDetail(_blockInfo)
+    }
+
     const context = {
         blocks: blocks,
         transactions: transactions,
         latestBlockNumber: latestBlockNumber,
         updateBlockNumber: updateBlockNumber,
         gasPrice: gasPrice,
+        blockDetail: blockDetail,
         fetchTokensFromAccount: fetchTokensFromAccount,
+        fetchBlockInformation: fetchBlockInformation,
     }
 
     return <AlchemyContext.Provider value={context}>{children}</AlchemyContext.Provider>
@@ -97,4 +107,14 @@ export const useAlchemy = () => {
     }, [context.latestBlockNumber])
 
     return context
+}
+
+export const useBlockDetail = (_blockNumber) => {
+    const context = useContext(AlchemyContext)
+
+    useEffect(() => {
+        context.fetchBlockInformation(parseInt(_blockNumber))
+    }, [_blockNumber])
+
+    return context.blockDetail
 }
