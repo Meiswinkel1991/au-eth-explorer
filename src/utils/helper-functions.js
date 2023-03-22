@@ -5,3 +5,11 @@ export const calculatePercent = (used, limit) => {
     console.log(used, limit, _percent)
     return parseFloat(_percent.toString()) / 100
 }
+
+export const addressShortener = (address) => {
+    if (address) {
+        return `${address.slice(1, 6)}...${address.slice(-6)}`
+    }
+
+    return ""
+}

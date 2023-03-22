@@ -7,9 +7,11 @@ const AlchemyContext = createContext({
     latestBlockNumber: 0,
     gasPrice: 0.0,
     blockDetail: {},
+    accountTrx: [],
     updateBlockNumber: () => {},
     fetchTokensFromAccount: () => {},
     fetchBlockInformation: () => {},
+    fetchAccountTransfers: () => {},
 })
 
 export const AlchemyProvider = ({ children, apiKey }) => {
@@ -18,6 +20,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     const [latestBlockNumber, setLatestBlockNumber] = useState(0)
     const [gasPrice, setGasPrice] = useState(0.0)
     const [blockDetail, setBlockDetail] = useState()
+    const [accountTrx, setAccountTrx] = useState([])
 
     const settings = {
         apiKey: apiKey,
@@ -41,8 +44,6 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     const fetchGasPrice = async () => {
         const _gasPrice = await alchemy.core.getGasPrice()
 
-        console.log(`Actual Gas Price: ${Utils.formatUnits(_gasPrice, "gwei")}`)
-
         setGasPrice(parseFloat(Utils.formatUnits(_gasPrice, "gwei")).toFixed(0))
     }
 
@@ -52,7 +53,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
             const _block = await alchemy.core.getBlock(_blockNumber - i)
             _blocks.push(_block)
         }
-        console.log(_blocks)
+
         setBlocks(_blocks)
     }
 
@@ -72,14 +73,30 @@ export const AlchemyProvider = ({ children, apiKey }) => {
             const metaData = await alchemy.core.getTokenMetadata(token.contractAddress)
 
             token = { ...token, ...metaData }
-
-            console.log(token)
         })
     }
 
     const fetchBlockInformation = async (_blockNumber) => {
         const _blockInfo = await alchemy.core.getBlockWithTransactions(_blockNumber)
         setBlockDetail(_blockInfo)
+    }
+
+    const fetchAccountTransfers = async (address) => {
+        let transfers = []
+        const transfersTo = await alchemy.core.getAssetTransfers({
+            toAddress: address,
+            excludeZeroValue: true,
+            category: ["external", "internal", "erc20", "erc721", "erc1155", "specialnft"],
+        })
+
+        const transferFrom = await alchemy.core.getAssetTransfers({
+            fromAddress: address,
+            excludeZeroValue: true,
+            category: ["external", "internal", "erc20", "erc721", "erc1155", "specialnft"],
+        })
+        transfers = [...transfersTo.transfers, ...transferFrom.transfers]
+        transfers.sort((a, b) => parseInt(b.blockNum) - parseInt(a.blockNum))
+        setAccountTrx(transfers)
     }
 
     const context = {
@@ -89,8 +106,10 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         updateBlockNumber: updateBlockNumber,
         gasPrice: gasPrice,
         blockDetail: blockDetail,
+        accountTrx: accountTrx,
         fetchTokensFromAccount: fetchTokensFromAccount,
         fetchBlockInformation: fetchBlockInformation,
+        fetchAccountTransfers: fetchAccountTransfers,
     }
 
     return <AlchemyContext.Provider value={context}>{children}</AlchemyContext.Provider>
@@ -117,4 +136,13 @@ export const useBlockDetail = (_blockNumber) => {
     }, [_blockNumber])
 
     return context.blockDetail
+}
+
+export const useAccount = (address) => {
+    const context = useContext(AlchemyContext)
+
+    useEffect(() => {
+        context.fetchAccountTransfers(address)
+    }, [])
+    return context.accountTrx
 }

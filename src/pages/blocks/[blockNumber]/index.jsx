@@ -34,7 +34,9 @@ const BlockDetail = () => {
                     <div className="col-span-2 text-blue-900">
                         {block?.gasUsed ? utils.commify(block?.gasUsed) : ""}{" "}
                         <span className="text-slate-300">
-                            {`(${calculatePercent(block.gasUsed, block.gasLimit)}%)`}
+                            {`(${
+                                block ? calculatePercent(block?.gasUsed, block?.gasLimit) : ""
+                            }%)`}
                         </span>
                     </div>
                     <div className="text-slate-400">Gas Limit:</div>
@@ -43,8 +45,7 @@ const BlockDetail = () => {
                     </div>
                     <div className="text-slate-400">Base Fee per Gas:</div>
                     <div className="col-span-2 text-blue-900">
-                        {block?.gasUsed ? utils.formatUnits(block?.baseFeePerGas, "gwei") : ""}{" "}
-                        Gwei
+                        {block ? utils.formatUnits(block?.baseFeePerGas, "gwei") : ""} Gwei
                     </div>
                 </div>
             </div>
