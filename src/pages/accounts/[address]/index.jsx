@@ -1,18 +1,20 @@
 import { useRouter } from "next/router"
 import { useAccount } from "@/store/alchemy"
 import { addressShortener } from "@/utils/helper-functions"
+import TokenBalanceDashboard from "@/components/account/token-balances/TokenBalanceDashboard"
 
 const AccountDetail = () => {
     const router = useRouter()
     const { address } = router.query
 
-    const accountTrx = useAccount(address)
+    const { accountTrx, accountTokenBalance } = useAccount(address)
 
     return (
         <div className="container max-w-4xl mx-auto mt-4  ">
             <div className="w-full bg-white rounded-lg px-4 py-2">
                 <h1 className="text-lg text-blue-900">Address: {address}</h1>
             </div>
+            <TokenBalanceDashboard tokenBalances={accountTokenBalance} />
             <div className="w-full bg-white rounded-lg mt-4 overflow-hidden">
                 <table className="divide-y divide-blue-400 w-full text-center ">
                     <thead className="bg-slate-100 ">

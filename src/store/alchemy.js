@@ -8,19 +8,25 @@ const AlchemyContext = createContext({
     gasPrice: 0.0,
     blockDetail: {},
     accountTrx: [],
+    accountTokenBalance: [],
+    isLoading: true,
     updateBlockNumber: () => {},
     fetchTokensFromAccount: () => {},
     fetchBlockInformation: () => {},
     fetchAccountTransfers: () => {},
+    setIsloading: () => {},
 })
 
 export const AlchemyProvider = ({ children, apiKey }) => {
+    const [isLoading, setIsLoading] = useState(true)
+
     const [blocks, setBlocks] = useState([])
     const [transactions, setTransactions] = useState([])
     const [latestBlockNumber, setLatestBlockNumber] = useState(0)
     const [gasPrice, setGasPrice] = useState(0.0)
     const [blockDetail, setBlockDetail] = useState()
     const [accountTrx, setAccountTrx] = useState([])
+    const [accountTokenBalance, setAccountTokenBalance] = useState([])
 
     const settings = {
         apiKey: apiKey,
@@ -64,16 +70,31 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     }
 
     const fetchTokensFromAccount = async (address) => {
-        const accountInfoTokens = await alchemy.core.getTokenBalances(address)
-        const _tokenBalances = accountInfoTokens.tokenBalances
+        setIsLoading(true)
 
-        const tokenBalanceData = []
+        try {
+            const accountInfoTokens = await alchemy.core.getTokenBalances(address)
+            const _tokenBalances = accountInfoTokens.tokenBalances
 
-        _tokenBalances.forEach(async (token) => {
-            const metaData = await alchemy.core.getTokenMetadata(token.contractAddress)
+            const tokenBalanceData = []
+            console.log(_tokenBalances)
+            _tokenBalances.forEach(async (token) => {
+                console.log(parseInt(token.tokenBalance))
+                if (parseInt(token.tokenBalance) > 0) {
+                    const metaData = await alchemy.core.getTokenMetadata(token.contractAddress)
 
-            token = { ...token, ...metaData }
-        })
+                    token = { ...token, ...metaData }
+
+                    tokenBalanceData.push(token)
+                }
+            })
+            console.log(tokenBalanceData)
+            setAccountTokenBalance(tokenBalanceData)
+            setIsLoading(false)
+        } catch (e) {
+            console.error(e)
+            setIsLoading(false)
+        }
     }
 
     const fetchBlockInformation = async (_blockNumber) => {
@@ -107,9 +128,12 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         gasPrice: gasPrice,
         blockDetail: blockDetail,
         accountTrx: accountTrx,
+        accountTokenBalance: accountTokenBalance,
+        isLoading: isLoading,
         fetchTokensFromAccount: fetchTokensFromAccount,
         fetchBlockInformation: fetchBlockInformation,
         fetchAccountTransfers: fetchAccountTransfers,
+        fetchTokensFromAccount: fetchTokensFromAccount,
     }
 
     return <AlchemyContext.Provider value={context}>{children}</AlchemyContext.Provider>
@@ -143,6 +167,11 @@ export const useAccount = (address) => {
 
     useEffect(() => {
         context.fetchAccountTransfers(address)
+        context.fetchTokensFromAccount(address)
     }, [])
-    return context.accountTrx
+    return {
+        accountTrx: context.accountTrx,
+        accountTokenBalance: context.accountTokenBalance,
+        isLoading: context.isLoading,
+    }
 }
