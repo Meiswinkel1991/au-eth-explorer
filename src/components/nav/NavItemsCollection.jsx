@@ -12,7 +12,7 @@ const NavItemsCollection = () => {
                 <NavItem href="/blocks" mobile>
                     Blocks
                 </NavItem>
-                <NavItem href="#" mobile>
+                <NavItem href="/transactions" mobile>
                     Transactions
                 </NavItem>
                 <NavItem href="/accounts" mobile>

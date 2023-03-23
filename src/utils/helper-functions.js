@@ -8,7 +8,7 @@ export const calculatePercent = (used, limit) => {
 
 export const addressShortener = (address) => {
     if (address) {
-        return `${address.slice(1, 6)}...${address.slice(-6)}`
+        return `${address.slice(0, 6)}...${address.slice(-6)}`
     }
 
     return ""

@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from "react"
 import { Network, Alchemy, Utils } from "alchemy-sdk"
+import { ethers } from "ethers"
 
 const AlchemyContext = createContext({
     blocks: [],
@@ -9,16 +10,19 @@ const AlchemyContext = createContext({
     blockDetail: {},
     accountTrx: [],
     accountTokenBalance: [],
+    accountEtherBalance: 0,
     isLoading: true,
     updateBlockNumber: () => {},
     fetchTokensFromAccount: () => {},
-    fetchBlockInformation: () => {},
+    fetchBlockInformation: async () => {},
     fetchAccountTransfers: () => {},
     setIsloading: () => {},
+    fetchAccountEtherBalance: () => {},
+    fetchTrxData: async () => {},
 })
 
 export const AlchemyProvider = ({ children, apiKey }) => {
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
 
     const [blocks, setBlocks] = useState([])
     const [transactions, setTransactions] = useState([])
@@ -27,6 +31,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     const [blockDetail, setBlockDetail] = useState()
     const [accountTrx, setAccountTrx] = useState([])
     const [accountTokenBalance, setAccountTokenBalance] = useState([])
+    const [accountEtherBalance, setAccountEtherBalance] = useState(0)
 
     const settings = {
         apiKey: apiKey,
@@ -97,9 +102,23 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         }
     }
 
+    const fetchAccountEtherBalance = async (address) => {
+        const balance = await alchemy.core.getBalance(address)
+        const transformBalance = ethers.utils.formatEther(balance)
+        setAccountEtherBalance(transformBalance)
+    }
+
     const fetchBlockInformation = async (_blockNumber) => {
-        const _blockInfo = await alchemy.core.getBlockWithTransactions(_blockNumber)
-        setBlockDetail(_blockInfo)
+        setIsLoading(true)
+        try {
+            const _blockInfo = await alchemy.core.getBlockWithTransactions(_blockNumber)
+            setBlockDetail(_blockInfo)
+            console.log(_blockInfo)
+            setIsLoading(false)
+        } catch (e) {
+            console.error(e)
+            setIsLoading(false)
+        }
     }
 
     const fetchAccountTransfers = async (address) => {
@@ -120,6 +139,19 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         setAccountTrx(transfers)
     }
 
+    const fetchTrxData = async (trxHash) => {
+        setIsLoading(true)
+        try {
+            const trx = await alchemy.core.getTransaction(trxHash)
+            const trxReceipt = await alchemy.core.getTransactionReceipt(trxHash)
+            setIsLoading(false)
+            return { ...trx, ...trxReceipt }
+        } catch (e) {
+            console.error(e)
+            setIsLoading(false)
+        }
+    }
+
     const context = {
         blocks: blocks,
         transactions: transactions,
@@ -128,12 +160,15 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         gasPrice: gasPrice,
         blockDetail: blockDetail,
         accountTrx: accountTrx,
-        accountTokenBalance: accountTokenBalance,
+        accountEtherBalance: accountEtherBalance,
         isLoading: isLoading,
         fetchTokensFromAccount: fetchTokensFromAccount,
         fetchBlockInformation: fetchBlockInformation,
         fetchAccountTransfers: fetchAccountTransfers,
         fetchTokensFromAccount: fetchTokensFromAccount,
+        fetchAccountEtherBalance: fetchAccountEtherBalance,
+        accountTokenBalance: accountTokenBalance,
+        fetchTrxData: fetchTrxData,
     }
 
     return <AlchemyContext.Provider value={context}>{children}</AlchemyContext.Provider>
@@ -152,26 +187,20 @@ export const useAlchemy = () => {
     return context
 }
 
-export const useBlockDetail = (_blockNumber) => {
-    const context = useContext(AlchemyContext)
-
-    useEffect(() => {
-        context.fetchBlockInformation(parseInt(_blockNumber))
-    }, [_blockNumber])
-
-    return context.blockDetail
-}
-
 export const useAccount = (address) => {
     const context = useContext(AlchemyContext)
 
     useEffect(() => {
-        context.fetchAccountTransfers(address)
-        context.fetchTokensFromAccount(address)
-    }, [])
+        if (address) {
+            context.fetchAccountTransfers(address)
+            context.fetchTokensFromAccount(address)
+            context.fetchAccountEtherBalance(address)
+        }
+    }, [address])
     return {
         accountTrx: context.accountTrx,
         accountTokenBalance: context.accountTokenBalance,
+        accountEtherBalance: context.accountEtherBalance,
         isLoading: context.isLoading,
     }
 }

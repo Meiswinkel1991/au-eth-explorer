@@ -17,6 +17,7 @@ const TransactionList = () => {
                         trxHash={trx.hash}
                         from={trx.from}
                         value={trx.value}
+                        to={trx.to}
                     />
                 )
             })}

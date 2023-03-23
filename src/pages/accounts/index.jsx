@@ -1,17 +1,12 @@
-import { useAlchemy } from "@/store/alchemy"
+import SearchBar from "@/components/searchbar/SearchBar"
 
 const Accounts = () => {
-    const { fetchTokensFromAccount } = useAlchemy()
-
     return (
-        <div>
-            <button
-                onClick={() =>
-                    fetchTokensFromAccount("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
-                }
-            >
-                Fetch data
-            </button>
+        <div className="max-w-3xl  mx-auto my-4">
+            <h1 className="text-2xl text-blue-900 text-center py-4 font-semibold">
+                Searching Account
+            </h1>
+            <SearchBar />
         </div>
     )
 }
