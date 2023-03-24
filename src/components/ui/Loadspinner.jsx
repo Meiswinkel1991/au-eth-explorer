@@ -8,7 +8,7 @@ const Loadspinner = () => {
             <CirclesWithBar
                 height="100"
                 width="100"
-                color="rgb(30 58 138)"
+                color="rgb(147 197 253)"
                 wrapperStyle={{}}
                 wrapperClass=""
                 visible={true}

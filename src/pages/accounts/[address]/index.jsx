@@ -10,7 +10,8 @@ const AccountDetail = () => {
     const router = useRouter()
     const { address } = router.query
 
-    const { accountTrx, accountTokenBalance, accountEtherBalance } = useAccount(address)
+    const { accountTrx, accountTokenBalance, accountEtherBalance, onlyUnknownTokens } =
+        useAccount(address)
 
     return (
         <div className="container max-w-4xl mx-auto mt-4  ">
@@ -29,7 +30,8 @@ const AccountDetail = () => {
                     />
                 </div>
             </div>
-            <TokenBalanceDashboard tokenBalances={accountTokenBalance} />
+            {!onlyUnknownTokens && <TokenBalanceDashboard tokenBalances={accountTokenBalance} />}
+
             <div className="w-full bg-white rounded-lg mt-4 border overflow-hidden">
                 <table className="divide-y divide-blue-400 w-full text-center ">
                     <thead className="bg-slate-100 ">
@@ -58,13 +60,13 @@ const AccountDetail = () => {
                                         {trx.asset}
                                     </td>
                                     <td
-                                        className={`px-6 py-4 text-sm text-right text-slate-500 ${
+                                        className={`px-6 py-4 text-sm text-right  ${
                                             trx.to.toLowerCase() === address.toLowerCase()
                                                 ? "text-green-500"
                                                 : "text-red-500"
                                         } `}
                                     >
-                                        {trx.value.toFixed(3)}
+                                        {trx.value?.toFixed(3)}
                                     </td>
                                 </tr>
                             )

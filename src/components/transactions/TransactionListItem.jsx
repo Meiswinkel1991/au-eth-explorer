@@ -19,15 +19,15 @@ export const TransactionListItem = ({ trxHash, from, value, to }) => {
                 </div>
             </div>
             <div className="flex flex-start space-x-2">
-                <h2 className="text-blue-900">
-                    {parseFloat(Utils.formatEther(value)).toFixed(3)}{" "}
-                </h2>
                 <Image
                     src="/ethereum-eth-logo-dark-blue.svg"
                     width={12}
                     height={12}
                     alt="ethereum logo"
                 />
+                <h2 className="text-blue-900">
+                    {parseFloat(Utils.formatEther(value)).toFixed(3)}{" "}
+                </h2>
             </div>
             <div className="flex flex-end items-center space-x-4  ">
                 <div className="flex flex-col text-slate-400 justify-between ">

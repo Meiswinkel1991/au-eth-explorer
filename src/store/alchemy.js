@@ -12,6 +12,7 @@ const AlchemyContext = createContext({
     accountTokenBalance: [],
     accountEtherBalance: 0,
     isLoading: true,
+    onlyUnknownTokens: true,
     updateBlockNumber: () => {},
     fetchTokensFromAccount: () => {},
     fetchBlockInformation: async () => {},
@@ -30,6 +31,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     const [gasPrice, setGasPrice] = useState(0.0)
     const [blockDetail, setBlockDetail] = useState()
     const [accountTrx, setAccountTrx] = useState([])
+    const [onlyUnknownTokens, setOnlyUnknownTokens] = useState(true)
     const [accountTokenBalance, setAccountTokenBalance] = useState([])
     const [accountEtherBalance, setAccountEtherBalance] = useState(0)
 
@@ -70,30 +72,33 @@ export const AlchemyProvider = ({ children, apiKey }) => {
 
     const fetchTransactions = async (_blockNumber) => {
         const _blockData = await alchemy.core.getBlockWithTransactions(_blockNumber)
-        console.log(_blockData.transactions)
+
         setTransactions(_blockData.transactions)
     }
 
     const fetchTokensFromAccount = async (address) => {
         setIsLoading(true)
+        setOnlyUnknownTokens(true)
 
         try {
             const accountInfoTokens = await alchemy.core.getTokenBalances(address)
             const _tokenBalances = accountInfoTokens.tokenBalances
 
             const tokenBalanceData = []
-            console.log(_tokenBalances)
+
             _tokenBalances.forEach(async (token) => {
                 console.log(parseInt(token.tokenBalance))
                 if (parseInt(token.tokenBalance) > 0) {
                     const metaData = await alchemy.core.getTokenMetadata(token.contractAddress)
-
+                    if (metaData.logo && onlyUnknownTokens) {
+                        setOnlyUnknownTokens(false)
+                    }
                     token = { ...token, ...metaData }
 
                     tokenBalanceData.push(token)
                 }
             })
-            console.log(tokenBalanceData)
+
             setAccountTokenBalance(tokenBalanceData)
             setIsLoading(false)
         } catch (e) {
@@ -113,7 +118,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         try {
             const _blockInfo = await alchemy.core.getBlockWithTransactions(_blockNumber)
             setBlockDetail(_blockInfo)
-            console.log(_blockInfo)
+
             setIsLoading(false)
         } catch (e) {
             console.error(e)
@@ -144,6 +149,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         try {
             const trx = await alchemy.core.getTransaction(trxHash)
             const trxReceipt = await alchemy.core.getTransactionReceipt(trxHash)
+            await fetchBlockInformation(parseInt(trx.blockNumber))
             setIsLoading(false)
             return { ...trx, ...trxReceipt }
         } catch (e) {
@@ -161,6 +167,7 @@ export const AlchemyProvider = ({ children, apiKey }) => {
         blockDetail: blockDetail,
         accountTrx: accountTrx,
         accountEtherBalance: accountEtherBalance,
+        onlyUnknownTokens: onlyUnknownTokens,
         isLoading: isLoading,
         fetchTokensFromAccount: fetchTokensFromAccount,
         fetchBlockInformation: fetchBlockInformation,
@@ -202,5 +209,6 @@ export const useAccount = (address) => {
         accountTokenBalance: context.accountTokenBalance,
         accountEtherBalance: context.accountEtherBalance,
         isLoading: context.isLoading,
+        onlyUnknownTokens: context.onlyUnknownTokens,
     }
 }

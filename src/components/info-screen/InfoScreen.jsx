@@ -12,9 +12,9 @@ const InfoScreen = ({ cryptoPrices }) => {
             <div className="w-full px-4">
                 <InfoBlock
                     header="Ether Price"
-                    info={cryptoPrices[1].quote.USD.price.toLocaleString("en-US", {
+                    info={`${cryptoPrices[1].quote.USD.price.toLocaleString("en-US", {
                         minimumFractionDigits: 2,
-                    })}
+                    })} $`}
                 >
                     <Image
                         src="/ethereum-eth-logo-light-blue.svg"
@@ -26,9 +26,9 @@ const InfoScreen = ({ cryptoPrices }) => {
                 <div className="bg-slate-200 w-full px-2 h-[1px]"></div>
                 <InfoBlock
                     header="Market Cap"
-                    info={cryptoPrices[1].quote.USD.market_cap.toLocaleString("en-US", {
+                    info={`${cryptoPrices[1].quote.USD.market_cap.toLocaleString("en-US", {
                         minimumFractionDigits: 2,
-                    })}
+                    })} $`}
                 >
                     <MdInsights className="text-blue-300 text-3xl font-light" />
                 </InfoBlock>

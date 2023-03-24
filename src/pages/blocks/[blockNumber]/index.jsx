@@ -5,6 +5,7 @@ import { calculatePercent } from "@/utils/helper-functions"
 import { TransactionListItem } from "@/components/transactions/TransactionListItem"
 import { useState, useEffect } from "react"
 import Loadspinner from "@/components/ui/Loadspinner"
+import TimestampBadge from "@/components/ui/TimestampBadge"
 
 const BlockDetail = () => {
     const router = useRouter()
@@ -32,9 +33,7 @@ const BlockDetail = () => {
                             <div className="text-slate-400">Block Height:</div>
                             <div className="col-span-2 text-blue-900">{blockNumber}</div>
                             <div className="text-slate-400">Timestamp:</div>
-                            <div className="col-span-2 text-blue-900">
-                                {blockDetail?.timestamp}
-                            </div>
+                            <TimestampBadge timestamp={blockDetail?.timestamp} />
                             <div className="text-slate-400">Transactions:</div>
                             <div className="col-span-2 text-blue-900">
                                 {blockDetail?.transactions.length} transactions
