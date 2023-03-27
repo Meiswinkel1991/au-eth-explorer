@@ -22,7 +22,7 @@ const AlchemyContext = createContext({
     fetchTrxData: async () => {},
 })
 
-export const AlchemyProvider = ({ children, apiKey }) => {
+export const AlchemyProvider = ({ children, alchemy }) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const [blocks, setBlocks] = useState([])
@@ -34,13 +34,6 @@ export const AlchemyProvider = ({ children, apiKey }) => {
     const [onlyUnknownTokens, setOnlyUnknownTokens] = useState(true)
     const [accountTokenBalance, setAccountTokenBalance] = useState([])
     const [accountEtherBalance, setAccountEtherBalance] = useState(0)
-
-    const settings = {
-        apiKey: apiKey,
-        network: Network.ETH_MAINNET,
-    }
-
-    const alchemy = new Alchemy(settings)
 
     const updateBlockNumber = async () => {
         const _blockNumber = await alchemy.core.getBlockNumber()
